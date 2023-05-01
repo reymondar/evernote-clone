@@ -1,8 +1,8 @@
 import React , { useState }from 'react'
-import { auth } from '@/pages'
-import { getAuth , Auth , GoogleAuthProvider , signInWithPopup , signOut, UserProfile, UserMetadata } from 'firebase/auth'
+import { getAuth , GoogleAuthProvider , signInWithPopup , signOut } from 'firebase/auth'
 import AddNote from './AddNote'
 import Notes from './Notes'
+import { useAuth } from '@/hooks/useAuth'
 
 
 
@@ -11,9 +11,8 @@ const googleProvider = new GoogleAuthProvider()
 
 
 const App = () => {
-  const [user, setUser] = useState<UserMetadata | null>(null)
-  const [isUserLogged, setUserLogged] = useState<boolean>(false)
-
+  const { userLoggedIn } = useAuth() 
+  
   const [actualNote, setActualNote] = useState({title:'',description:'', uid:''})
 
   const handleLogin = () => {
@@ -22,11 +21,7 @@ const App = () => {
    signInWithPopup(auth, googleProvider)
       .then((result) => {
         const credential = GoogleAuthProvider.credentialFromResult(result)
-   
-        const user = result.user as UserMetadata
-        setUser(user)
-        setUserLogged(true)
-
+         
       }).catch((error) => {
         const errorCode = error.code
 
@@ -44,7 +39,7 @@ const App = () => {
     signOut(auth)
     .then((e)=>{
       alert('logged out')
-      setUserLogged(false)
+      //setUserLogged(false)
     })
     .catch((error)=>{
       console.log(error)
@@ -52,18 +47,18 @@ const App = () => {
   }
 
   return (
-    <>
+    <> 
         <div className='flex justify-center'>
-            {isUserLogged ?        
+            {userLoggedIn ?        
             <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogout}>Logout</button>
             :
             <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogin}>Login with Google</button>
             } 
         </div>
-            <h1>Hi {user?.displayName}</h1>
+        <p>holi</p>
         <div className='flex flex-col sm:flex-row justify-between sm:justify-center w-full h-5/6 sm:px-24'>
-            <Notes setActualNote={setActualNote} />
-            <AddNote user={user} actualNote={actualNote} setActualNote={setActualNote} />
+            <Notes actualNote={actualNote} setActualNote={setActualNote} />
+            <AddNote actualNote={actualNote} setActualNote={setActualNote} />
         </div>
     </>
   )

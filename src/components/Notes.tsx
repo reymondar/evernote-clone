@@ -2,6 +2,7 @@ import React, { SetStateAction, useEffect, useState } from 'react'
 import { db } from '../pages/index'
 import { onSnapshot, setDoc , doc , collection } from 'firebase/firestore'
 import { useAuth } from '../hooks/useAuth'
+import { onAuthStateChanged , Auth, getAuth } from 'firebase/auth'
 
 
 const Note = ({ index , handleIndex , name , title , description , uid , setNote }: { index:number , handleIndex: (p: number) => void , name: number , title: string , description: string , uid:number , setNote: React.Dispatch<SetStateAction<Note>> }) => {
@@ -31,30 +32,30 @@ type Note = {
 
 type Notes = Note[]
 
+type NotesProps = {
+  actualNote: Note,
+  setActualNote: React.Dispatch<SetStateAction<Note>>
+}
+ 
 
-
-const Notes = ({setActualNote}: any) => {
+const Notes = ({actualNote, setActualNote}: NotesProps) => {
   const [notes, setNotes] = useState<Notes | null>(null)
-  const [noteIndex , setNoteIndex] = useState(0)
+  const [noteIndex , setNoteIndex] = useState<number>(0)
 
-  const { user } = useAuth()
-  console.log(user)
-
+  const { user , userLoggedIn} = useAuth()
+ 
   useEffect(() => {
-    console.log("use effect run")
-    if(Object.keys(user).length > 0) {
-    try{
-
-    const collectionRef = collection(db,'users', user.uid,'notes')
+    
+    try {
+    const userId = user?.uid as string
+    const collectionRef = collection(db,'users', userId,'notes')
       
     const unsuscribe = onSnapshot(collectionRef, (notes) =>{
       const dbNotes: Notes = []
 
       notes.docs.forEach((doc,i) =>{
-        const note = doc.data() as Note
-        
+        const note = doc.data() as Note        
         dbNotes.push(note)
-        console.log("doc:" + doc.id)
 
         setNotes(dbNotes)
         
@@ -62,14 +63,16 @@ const Notes = ({setActualNote}: any) => {
       )
      }
     )
-    }
-    catch(e){
-      console.log(e)
-    }
   }
+  catch(error) {
+    console.log(error)
+  }
+  },[user])
 
-  },[])
+  useEffect(()=>{
+    userLoggedIn ? '' : (setNotes(null), setActualNote({title: '' , description: '' , uid: ''}))
 
+  },[userLoggedIn])
 
   
   const handleIndex = (i: number) => {

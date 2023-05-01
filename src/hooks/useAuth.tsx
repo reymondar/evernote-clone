@@ -4,16 +4,22 @@ import { doc , getDoc , setDoc } from 'firebase/firestore'
 import { db } from '@/pages'
 
 export const useAuth = () => {
-
+    
     const [user , setUser] = useState<User | null>(null)
-
+    const [userLoggedIn, setUserLoggedIn] = useState<boolean>(false)
     useEffect(()=>{
+
         const auth = getAuth()
         onAuthStateChanged(auth, (userNow) => {
             
             setUser(userNow)
+            console.log("authstatechanged the user is:" + userNow)
             
-            const docRef = doc(db , 'users' , userNow?.uid)
+            console.log("the user uid is:" + userNow?.uid)
+            const userId = userNow?.uid as string
+            setUserLoggedIn(userNow && userNow?.uid ? true : false)
+            
+            const docRef = userLoggedIn ? doc(db , 'users' , userId) : doc(db,'users','tester')
             
             const docGetter = getDoc(docRef)
             .then(usersDoc => {
@@ -30,7 +36,7 @@ export const useAuth = () => {
     },[])
 
     
-    return { user }
+    return { user , userLoggedIn }
 }
 
 
