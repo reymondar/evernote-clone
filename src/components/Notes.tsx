@@ -1,46 +1,57 @@
-import React, { SetStateAction, useEffect, useState } from 'react'
+import React, { SetStateAction, useEffect, useState , useContext } from 'react'
 import { db } from '../pages/index'
-import { onSnapshot, setDoc , doc , collection } from 'firebase/firestore'
+import { doc , onSnapshot , collection, deleteDoc } from 'firebase/firestore'
 import { useAuth } from '../hooks/useAuth'
-import { onAuthStateChanged , Auth, getAuth } from 'firebase/auth'
-
-
-const Note = ({ index , handleIndex , name , title , description , uid , setNote }: { index:number , handleIndex: (p: number) => void , name: number , title: string , description: string , uid:number , setNote: React.Dispatch<SetStateAction<Note>> }) => {
-  
-  
-  const handleNote = (e: React.SyntheticEvent<HTMLDivElement>) => {
-    handleIndex(name)
-    setNote({title: title, description: description, uid:uid})
-  }
-  return(
-    <div onClick={handleNote} className={`${index === name? 'border border-solid border-blue-400' : ''} flex flex-col place-content-between justify-between w-60 sm:w-full h-full sm:h-60 p-4 mx-2 sm:mx-0 sm:my-4 lg:mb-8 bg-white rounded-lg shadow hover:cursor-pointer`}>
-      <div>
-        <h1 className='text-md font-bold'>{title}</h1>
-        <h2 className='text-xs text-gray-500 py-2 overflow-hidden text-ellipsis max-w-full'>{description}</h2>
-      </div>
-      <p className='text-gray-500 text-xs w-24'>2 Minutes ago</p>
-    </div>
-  )
-}
-
+import { FaTrash } from 'react-icons/fa'
+import { Actions , NoteConext, NoteContextManager } from '@/context/NoteContext'
 type Note = {
   title:string,
   description:string,
-  uid: number
+  uid: string
 }
-
 
 type Notes = Note[]
 
 type NotesProps = {
   actualNote: Note,
   setActualNote: React.Dispatch<SetStateAction<Note>>
+} 
+
+const emptyNote = {
+  title:'',
+  description:'',
+  uid:''
+}
+
+const Note = ({ title , description , uid , deleteNote }: { title: string , description: string , uid: string , deleteNote: (arg: string) => void }) => {
+  
+  const currentNote = useContext(NoteConext)
+  const noteManager = useContext(NoteContextManager) as React.Dispatch<Actions>
+
+  const handleNote = () => noteManager( {type:"CHANGE_NOTE" , payload:{title: title, description: description, uid:uid}} )
+
+  const handleDelete = () => {
+    deleteNote(uid)
+    noteManager({type: "DELETE_NOTE"})
+
+  }
+  return(
+    <div onClick={handleNote} className={`${currentNote.uid === uid ? 'border border-solid border-blue-400' : ''} relative flex flex-col place-content-between justify-between w-60 sm:w-full h-full sm:h-60 p-4 mx-2 sm:mx-0 sm:my-4 lg:mb-8 bg-white rounded-lg shadow hover:cursor-pointer md:overflow-hidden`}>
+      <div>
+        <h1 className='text-md font-bold'>{title}</h1>
+        <h2 className='text-xs text-gray-500 py-2 overflow-hidden text-ellipsis max-w-full'>{description}</h2>
+      </div>
+      <p className='text-gray-500 text-xs w-24 md:pr-8 lg:pr-0'>2 Minutes ago</p>
+      <FaTrash onClick={handleDelete} className={`absolute bottom-3 md:bottom-5 lg:bottom-3a right-2 opacity-0 ${currentNote.uid === uid ? 'opacity-100' : ''} transition-all text-gray-300 md:text-lg hover:text-gray-500`}/>
+    </div>
+  )
 }
  
 
-const Notes = ({actualNote, setActualNote}: NotesProps) => {
+const Notes = () => {
   const [notes, setNotes] = useState<Notes | null>(null)
-  const [noteIndex , setNoteIndex] = useState<number>(0)
+
+  const noteManager = useContext(NoteContextManager) as React.Dispatch<Actions>
 
   const { user , userLoggedIn} = useAuth()
  
@@ -55,10 +66,10 @@ const Notes = ({actualNote, setActualNote}: NotesProps) => {
 
       notes.docs.forEach((doc,i) =>{
         const note = doc.data() as Note        
+  
         dbNotes.push(note)
 
-        setNotes(dbNotes)
-        
+        setNotes(dbNotes)       
       }
       )
      }
@@ -69,14 +80,24 @@ const Notes = ({actualNote, setActualNote}: NotesProps) => {
   }
   },[user])
 
-  useEffect(()=>{
-    userLoggedIn ? '' : (setNotes(null), setActualNote({title: '' , description: '' , uid: ''}))
 
+  useEffect(()=>{
+    if(!userLoggedIn) {
+      setNotes(null)
+      //Actually it's not a note deletion, but this action serves the purpose of emptying our note Object
+      noteManager({type: "DELETE_NOTE"})
+    }
+   
   },[userLoggedIn])
 
   
-  const handleIndex = (i: number) => {
-    setNoteIndex(i)
+  const deleteNote = (noteId: string) => {
+    const userId = user?.uid as string
+    const docRef = doc(db, 'users' , userId , 'notes' , noteId)
+    
+    deleteDoc(docRef)
+    
+    if(notes?.length === 1) setNotes(null)
   }
 
   return(
@@ -89,13 +110,10 @@ const Notes = ({actualNote, setActualNote}: NotesProps) => {
           {notes && notes.map((note,i) => {
               return <Note 
               key={i} 
-              index={noteIndex}
-              handleIndex={handleIndex}
-              name={i}
               title={note.title} 
-              description={note.description} 
-              uid={note.uid}
-              setNote={setActualNote} />
+              description={note.description}
+              uid={note.uid} 
+              deleteNote={deleteNote} />
           })}
           
       </div>

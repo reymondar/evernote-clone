@@ -3,19 +3,15 @@ import { getAuth , GoogleAuthProvider , signInWithPopup , signOut } from 'fireba
 import AddNote from './AddNote'
 import Notes from './Notes'
 import { useAuth } from '@/hooks/useAuth'
-
-
-
+import { NoteProvider } from '@/context/NoteContext'
 
 const googleProvider = new GoogleAuthProvider()
-
 
 const App = () => {
   const { userLoggedIn } = useAuth() 
   
-  const [actualNote, setActualNote] = useState({title:'',description:'', uid:''})
-
   const handleLogin = () => {
+    
     const auth = getAuth()
 
    signInWithPopup(auth, googleProvider)
@@ -48,18 +44,21 @@ const App = () => {
 
   return (
     <> 
+    
         <div className='flex justify-center'>
-            {userLoggedIn ?        
-            <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogout}>Logout</button>
-            :
-            <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogin}>Login with Google</button>
-            } 
+          {userLoggedIn ?        
+          <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogout}>Logout</button>
+          :
+          <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogin}>Login with Google</button>
+          } 
         </div>
         <p>holi</p>
-        <div className='flex flex-col sm:flex-row justify-between sm:justify-center w-full h-5/6 sm:px-24'>
-            <Notes actualNote={actualNote} setActualNote={setActualNote} />
-            <AddNote actualNote={actualNote} setActualNote={setActualNote} />
-        </div>
+        <NoteProvider>
+          <div className='flex flex-col sm:flex-row justify-between sm:justify-center w-full h-5/6 sm:px-24'>
+            <Notes />
+            <AddNote />
+          </div>
+        </NoteProvider>
     </>
   )
 }
