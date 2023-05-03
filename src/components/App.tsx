@@ -52,7 +52,6 @@ const App = () => {
           <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogin}>Login with Google</button>
           } 
         </div>
-        <p>holi</p>
         <NoteProvider>
           <div className='flex flex-col sm:flex-row justify-between sm:justify-center w-full h-5/6 sm:px-24'>
             <Notes />

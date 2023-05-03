@@ -13,7 +13,7 @@ export type Actions =
     | {type: "DESCRIPTION" , payload: string}
     | {type: "NEW_NOTE" , payload: string}
     | {type: "CHANGE_NOTE" , payload: Note}
-    | {type: "DELETE_NOTE"}
+    | {type: "DELETE_NOTE" , payload: Note}
 
 
 const reducer = (state: Note , action: Actions) => {

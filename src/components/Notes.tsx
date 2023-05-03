@@ -32,7 +32,8 @@ const Note = ({ title , description , uid , deleteNote }: { title: string , desc
 
   const handleDelete = () => {
     deleteNote(uid)
-    noteManager({type: "DELETE_NOTE"})
+    //deletion
+    noteManager({type: "CHANGE_NOTE", payload: emptyNote})
 
   }
   return(
@@ -85,7 +86,7 @@ const Notes = () => {
     if(!userLoggedIn) {
       setNotes(null)
       //Actually it's not a note deletion, but this action serves the purpose of emptying our note Object
-      noteManager({type: "DELETE_NOTE"})
+      noteManager({type: "CHANGE_NOTE", payload: emptyNote})
     }
    
   },[userLoggedIn])
