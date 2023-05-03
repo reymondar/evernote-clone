@@ -27,8 +27,7 @@ const reducer = (state: Note , action: Actions) => {
         case "CHANGE_NOTE":
             return action.payload
         case "DELETE_NOTE":
-        console.log('great, note deleted')
-            return defaultNote
+            return {...state , defaultNote}
         default:
             return state
     }

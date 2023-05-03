@@ -31,10 +31,10 @@ const Note = ({ title , description , uid , deleteNote }: { title: string , desc
   const handleNote = () => noteManager( {type:"CHANGE_NOTE" , payload:{title: title, description: description, uid:uid}} )
 
   const handleDelete = () => {
+    noteManager({type: "DELETE_NOTE", payload: emptyNote})
+
     deleteNote(uid)
     //deletion
-    noteManager({type: "CHANGE_NOTE", payload: emptyNote})
-
   }
   return(
     <div onClick={handleNote} className={`${currentNote.uid === uid ? 'border border-solid border-blue-400' : ''} relative flex flex-col place-content-between justify-between w-60 sm:w-full h-full sm:h-60 p-4 mx-2 sm:mx-0 sm:my-4 lg:mb-8 bg-white rounded-lg shadow hover:cursor-pointer md:overflow-hidden`}>
@@ -86,7 +86,7 @@ const Notes = () => {
     if(!userLoggedIn) {
       setNotes(null)
       //Actually it's not a note deletion, but this action serves the purpose of emptying our note Object
-      noteManager({type: "CHANGE_NOTE", payload: emptyNote})
+      noteManager({type: "DELETE_NOTE", payload: emptyNote })
     }
    
   },[userLoggedIn])
