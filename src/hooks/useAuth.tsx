@@ -13,13 +13,12 @@ export const useAuth = () => {
         onAuthStateChanged(auth, (userNow) => {
             
             setUser(userNow)
-            console.log("authstatechanged the user is:" + userNow)
-            
-            console.log("the user uid is:" + userNow?.uid)
+
             const userId = userNow?.uid as string
             setUserLoggedIn(userNow && userNow?.uid ? true : false)
             
-            const docRef = userLoggedIn ? doc(db , 'users' , userId) : doc(db,'users','tester')
+            if(userLoggedIn){
+            const docRef = doc(db , 'users' , userId)
             
             const docGetter = getDoc(docRef)
             .then(usersDoc => {
@@ -30,6 +29,7 @@ export const useAuth = () => {
                     setDoc(docRef,{})
                 }
             })
+        }
 
         }
 )

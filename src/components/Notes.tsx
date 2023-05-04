@@ -77,7 +77,7 @@ const Notes = () => {
     )
   }
   catch(error) {
-    console.log(error)
+    //Do nothing. Sorry but error handling is not included in the reymondar portfolio projects pack. For this feature you can send me $1k cash and i'll add it. :P
   }
   },[user])
 

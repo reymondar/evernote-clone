@@ -7,6 +7,8 @@ import { NoteProvider } from '@/context/NoteContext'
 
 const googleProvider = new GoogleAuthProvider()
 
+
+
 const App = () => {
   const { userLoggedIn } = useAuth() 
   
@@ -47,13 +49,13 @@ const App = () => {
     
         <div className='flex justify-center'>
           {userLoggedIn ?        
-          <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogout}>Logout</button>
+          <button className='shadow-md m-3 p-4 font-semibold rounded-md text-sm' onClick={handleLogout}>LOGOUT</button>
           :
-          <button className='text-2xl p-4 border border-solid border-gray-400 rounded-md' onClick={handleLogin}>Login with Google</button>
+          <button className='shadow-md m-3 p-4 font-semibold rounded-md text-sm' onClick={handleLogin}>Login with Google</button>
           } 
         </div>
         <NoteProvider>
-          <div className='flex flex-col sm:flex-row justify-between sm:justify-center w-full h-5/6 sm:px-24'>
+          <div className={`${!userLoggedIn ? 'blur-sm' : ''} flex flex-col sm:flex-row sm:justify-center w-full h-5/6 sm:px-24`}>
             <Notes />
             <AddNote />
           </div>
