@@ -1,4 +1,4 @@
-import React, { SetStateAction, useEffect, useState , useContext } from 'react'
+import React, { SetStateAction, useEffect, useState , useContext, memo } from 'react'
 import { db } from '../pages/index'
 import { doc , onSnapshot , collection, deleteDoc } from 'firebase/firestore'
 import { useAuth } from '../hooks/useAuth'
@@ -42,7 +42,7 @@ const Note = ({ title , description , uid , deleteNote }: { title: string , desc
         <h1 className='text-md font-bold'>{title}</h1>
         <h2 className='text-xs text-gray-500 py-2 overflow-hidden text-ellipsis max-w-full'>{description}</h2>
       </div>
-      <p className='text-gray-500 text-xs w-24 md:pr-8 lg:pr-0'>2 Minutes ago</p>
+      <p className='text-gray-500 text-xs w-24 md:pr-8 lg:pr-0'>Moments ago</p>
       <FaTrash onClick={handleDelete} className={`absolute bottom-3 md:bottom-5 lg:bottom-3a right-2 opacity-0 ${currentNote.uid === uid ? 'opacity-100' : ''} transition-all text-gray-300 md:text-lg hover:text-gray-500`}/>
     </div>
   )
