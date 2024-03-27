@@ -80,14 +80,17 @@ const AddNote = () => {
         <button 
               className='w-full py-4 bg-green-600 rounded-md  text-white hover:cursor-pointer hover:bg-green-200  transition-all disabled:hidden' 
               type='submit' 
-              onClick={handleSave}>
+              onClick={handleSave}
+              disabled={!userLoggedIn}
+              >
               SAVE
         </button>
         :
         <button 
               className='w-full py-4 bg-green-600 rounded-md  text-white hover:cursor-pointer hover:bg-green-200  transition-all disabled:hidden'
+              onClick={handleNewNote}
               disabled={!userLoggedIn} 
-              onClick={handleNewNote}>
+              >
               New Note
         </button>
       }
